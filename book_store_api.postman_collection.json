@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "Book Store API",
+    "description": "CRUD requests for the book_store Express + MongoDB backend. Set the collection variable `bookId` to an _id from the 'Get all books' response before running the single-book requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "bookId",
+      "value": "PASTE_A_BOOK_ID_HERE"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "Get all books",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/books"
+      }
+    },
+    {
+      "name": "Get one book",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/books/{{bookId}}"
+      }
+    },
+    {
+      "name": "Create a book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// saves the new book's _id so the other requests can use it",
+              "const body = pm.response.json();",
+              "const id = body._id || (body.data && body.data._id) || (body.book && body.book._id);",
+              "if (id) pm.collectionVariables.set('bookId', id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/books",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Himu\",\n  \"author\": \"Humayun Ahmed\",\n  \"price\": 250,\n  \"description\": \"A novel about the wandering Himu in yellow panjabi.\",\n  \"stock\": 10,\n  \"cover\": \"https://example.com/himu.jpg\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Update a book",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/books/{{bookId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": 300,\n  \"stock\": 8\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete a book",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/books/{{bookId}}"
+      }
+    }
+  ]
+}
