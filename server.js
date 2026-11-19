@@ -1,14 +1,9 @@
-// server/server.js
-// Main entry point for the Express backend
-
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import bookRoutes from './routes/bookRoutes.js';
 
-// import bookRoutes from './routes/bookRoutes.js';
-
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -20,26 +15,26 @@ if (!MONGODB_URI) {
     process.exit(1);
 }
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-// app.use('/api/books', bookRoutes);
-
-// Root endpoint
 app.get('/', (req, res) => {
     res.send('BookStore API is running');
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// all book routes live under /api/books (see routes/bookRoutes.js)
+app.use('/api/books', bookRoutes);
 
-mongoose.connect(MONGODB_URI)
+// connect to MongoDB first, THEN start the server
+mongoose
+    .connect(MONGODB_URI)
     .then(() => {
         console.log('MongoDB connected');
+        app.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
     })
-    .catch((err) => {
-        console.error('MongoDB connection error:', err);
+    .catch((error) => {
+        console.error('MongoDB connection failed:', error.message);
+        process.exit(1);
     });
